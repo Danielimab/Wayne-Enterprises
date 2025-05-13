@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Funcionário</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0d0d0d;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        h1 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        form {
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #2e2e2e;
+            width: 300px;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #2e2e2e;
+            border-radius: 5px;
+            background-color: #0d0d0d;
+            color: #ffffff;
+        }
+        button {
+            background-color: #ffd700;
+            color: #0d0d0d;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #e6b800;
+        }
+
+        #funcionariosList {
+            display: none; 
+            margin-top: 20px;
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #2e2e2e;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #2e2e2e;
+        }
+
+        th {
+            background-color: #1a1a1a;
+            color: #ffd700;
+        }
+
+        tr:hover {
+            background-color: #2e2e2e;
+        }
+
+        .actions button {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cadastrar Novo Funcionário</h1>
+    <form id="cadastroForm">
+        <label for="username">Usuário:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Senha:</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="role">Cargo:</label>
+        <select id="role" name="role" required>
+            <option value="employee">Funcionário</option>
+            <option value="manager">Gerente</option>
+            <option value="security_admin">Administrador de Segurança</option>
+        </select>
+
+        <button type="submit">Cadastrar</button>
+        <button type="button" onclick="window.location.href='index.html'">Voltar</button>
+    </form>
+
+    <button id="listarFuncionariosBtn">Listar Funcionários</button>
+
+    <div id="funcionariosList">
+        <h2>Funcionários Cadastrados</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Usuário</th>
+                    <th>Cargo</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="funcionariosTableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cadastroForm = document.getElementById('cadastroForm');
+            const listarFuncionariosBtn = document.getElementById('listarFuncionariosBtn');
+            const funcionariosList = document.getElementById('funcionariosList');
+            const funcionariosTableBody = document.getElementById('funcionariosTableBody');
+
+            // Função para carregar a lista de funcionários
+            async function loadFuncionarios() {
+                try {
+                    const user = JSON.parse(localStorage.getItem('user'));
+                    if (!user) {
+                        alert('Usuário não autenticado. Redirecionando para a página de login.');
+                        window.location.href = 'login.html';
+                        return;
+                    }
+
+                    const response = await fetch('http://localhost:3000/api/auth/funcionarios', {
+                        headers: {
+                            'Authorization': user.id
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Erro ao carregar funcionários');
+                    }
+
+                    const funcionarios = await response.json();
+                    renderFuncionarios(funcionarios);
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('Erro ao carregar funcionários. Tente novamente.');
+                }
+            }
+
+            // Função para renderizar a lista de funcionários
+            function renderFuncionarios(funcionarios) {
+                funcionariosTableBody.innerHTML = '';
+                funcionarios.forEach(funcionario => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `  
+                        <td>${funcionario.id}</td>
+                        <td>${funcionario.username}</td>
+                        <td>${funcionario.role}</td>
+                        <td class="actions">
+                            <button onclick="excluirFuncionario(${funcionario.id})">Excluir</button>
+                        </td>
+                    `;
+                    funcionariosTableBody.appendChild(row);
+                });
+            }
+
+            // Função para excluir um funcionário
+            window.excluirFuncionario = async (id) => {
+                if (confirm('Tem certeza que deseja excluir este funcionário?')) {
+                    try {
+                        const user = JSON.parse(localStorage.getItem('user'));
+                        if (!user) {
+                            alert('Usuário não autenticado. Redirecionando para a página de login.');
+                            window.location.href = 'login.html';
+                            return;
+                        }
+
+                        const response = await fetch('http://localhost:3000/api/auth/excluir-funcionario', {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': user.id
+                            },
+                            body: JSON.stringify({ id })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Erro ao excluir funcionário');
+                        }
+
+                        alert('Funcionário excluído com sucesso!');
+                        loadFuncionarios();
+                    } catch (error) {
+                        console.error('Erro:', error);
+                        alert('Erro ao excluir funcionário. Tente novamente.');
+                    }
+                }
+            };
+
+            // Mostrar/ocultar a lista de funcionários
+            listarFuncionariosBtn.addEventListener('click', () => {
+                if (funcionariosList.style.display === 'none') {
+                    funcionariosList.style.display = 'block';
+                    loadFuncionarios();
+                } else {
+                    funcionariosList.style.display = 'none';
+                }
+            });
+
+            // Cadastrar novo funcionário
+            cadastroForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const role = document.getElementById('role').value;
+
+                try {
+                    const user = JSON.parse(localStorage.getItem('user'));
+                    if (!user) {
+                        alert('Usuário não autenticado. Redirecionando para a página de login.');
+                        window.location.href = 'login.html';
+                        return;
+                    }
+
+                    const response = await fetch('http://localhost:3000/api/auth/cadastrar', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': user.id
+                        },
+                        body: JSON.stringify({ username, password, role })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Erro ao cadastrar funcionário');
+                    }
+
+                    alert('Funcionário cadastrado com sucesso!');
+                    cadastroForm.reset(); // Limpa o formulário
+                    loadFuncionarios(); // Atualiza a lista de funcionários
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('Erro ao cadastrar funcionário. Tente novamente.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
