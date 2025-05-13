@@ -1,0 +1,48 @@
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0d0d0d;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        h1 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 50px;
+        }
+        #accessButtons {
+            margin-top: 20px;
+        }
+        #accessButtons a {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #ffd700;
+            color: #0d0d0d;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        #accessButtons a:hover {
+            background-color: #e6b800;
+        }
+        #logoutButton {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #ff0000;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        #logoutButton:hover {
+            background-color: #cc0000;
+        }

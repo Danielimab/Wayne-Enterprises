@@ -4,66 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #0d0d0d;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            flex-direction: column;
-        }
-
-        h1 {
-            color: #ffd700;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 50px;
-        }
-
-        form {
-            background-color: #1a1a1a;
-            padding: 20px;
-            border-radius: 10px;
-            border: 2px solid #2e2e2e;
-            width: 300px;
-            text-align: center;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 10px;
-            color: #ffffff;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #2e2e2e;
-            border-radius: 5px;
-            background-color: #0d0d0d;
-            color: #ffffff;
-        }
-
-        button {
-            background-color: #ffd700;
-            color: #0d0d0d;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #e6b800;
-        }
-    </style>
+    <link rel="stylesheet" href="../css/login.css">
 </head>
 <body>
     <h1>Login</h1>
@@ -75,39 +16,6 @@
         <button type="submit">Entrar</button>
     </form>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const loginForm = document.getElementById('loginForm');
-
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault(); 
-
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-
-                try {
-                    const response = await fetch('http://localhost:3000/api/auth/login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ username, password })
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Credenciais inválidas');
-                    }
-
-                    const data = await response.json();
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    alert('Login bem-sucedido!');
-                    window.location.href = 'index.html';
-                } catch (error) {
-                    console.error('Erro:', error);
-                    alert('Erro ao fazer login. Verifique suas credenciais.');
-                }
-            });
-        });
-    </script>
+<script src="../js/login.js"></script>
 </body>
 </html>
